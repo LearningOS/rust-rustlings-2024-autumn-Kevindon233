@@ -2,7 +2,7 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -56,6 +56,20 @@ impl<T> LinkedList<T> {
         self.length += 1;
     }
 
+    pub fn add_ptr(&mut self, ptr: Option<NonNull<Node<T>>>) {
+        if ptr.is_none() {
+            return;
+        }
+
+        unsafe { (*ptr.unwrap().as_ptr()).next = None }
+        match self.end {
+            None => self.start = ptr,
+            Some(end_ptr) => unsafe { (*end_ptr.as_ptr()).next = ptr },
+        }
+        self.end = ptr;
+        self.length += 1;
+    }
+
     pub fn get(&mut self, index: i32) -> Option<&T> {
         self.get_ith_node(self.start, index)
     }
@@ -70,13 +84,34 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+    where
+        T: PartialOrd + Ord,
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let mut node_a = list_a.start;
+        let mut node_b = list_b.start;
+        let mut merged_list = Self::new();
+        while node_a.is_some() && node_b.is_some() {
+            let val_a = unsafe { &(*node_a.unwrap().as_ptr()).val };
+            let val_b = unsafe { &(*node_b.unwrap().as_ptr()).val };
+            let mut t: Option<NonNull<Node<T>>>;
+            if val_a < val_b {
+                t = unsafe { (*node_a.unwrap().as_ptr()).next };
+                merged_list.add_ptr(node_a);
+                node_a = t;
+            } else {
+                t = unsafe { (*node_b.unwrap().as_ptr()).next };
+                merged_list.add_ptr(node_b);
+                node_b = t;
+            }
         }
+		if node_a.is_some() {
+            unsafe { (*merged_list.end.unwrap().as_ptr()).next = node_a}
+        } else {
+            unsafe { (*merged_list.end.unwrap().as_ptr()).next = node_b}
+        }
+        merged_list.length = list_a.length + list_b.length;
+        merged_list
 	}
 }
 

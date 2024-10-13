@@ -3,7 +3,7 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
+
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -50,13 +50,52 @@ where
 
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
-        //TODO
+        if self.root.is_none() {
+            self.root = Some(Box::new(TreeNode::new(value)));
+            return;
+        }
+        let root = self.root.as_mut().unwrap();
+        if value < root.value {
+            if let Some(node) = &mut root.left {
+                node.insert(value);
+            } else {
+                root.left = Some(Box::new(TreeNode::new(value)));
+            }
+        } else if value > root.value {
+            if let Some(node) = &mut root.right {
+                node.insert(value);
+            } else {
+                root.right = Some(Box::new(TreeNode::new(value)));
+            }
+        }
+
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
         //TODO
-        true
+        if self.root.is_none() {
+            return false;
+        }
+        if let Some(root) = &self.root {
+            if value < root.value {
+                if let Some(left_node) = &root.left {
+                    left_node.search(value)
+                } else {
+                    false
+                }
+            } else if value > root.value {
+                if let Some(right_node) = &root.right {
+                    right_node.search(value)
+                } else {
+                    false
+                }
+            } else {
+                true
+            }
+        } else {
+            false
+        }
     }
 }
 
@@ -67,6 +106,37 @@ where
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
         //TODO
+        if value < self.value {
+            if let Some(left_node) = &mut self.left {
+                left_node.insert(value);
+            } else {
+                self.left = Some(Box::new(TreeNode::new(value)));
+            }
+        } else {
+            if let Some(right_node) = &mut self.right {
+                right_node.insert(value);
+            } else {
+                self.right = Some(Box::new(TreeNode::new(value)));
+            }
+        }
+    }
+
+    fn search(&self, value: T) -> bool {
+        if value < self.value {
+            if let Some(left_node) = &self.left {
+                left_node.search(value)
+            } else {
+                false
+            }
+        } else if value > self.value {
+            if let Some(right_node) = &self.right {
+                right_node.search(value)
+            } else {
+                false
+            }
+        } else {
+            true
+        }
     }
 }
 
